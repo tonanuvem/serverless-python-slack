@@ -22,9 +22,10 @@ def get_timestamp():
     return datetime.now().strftime(("%Y-%m-%d %H:%M:%S"))
 '''
 
-def kafka(msg):
+def kafka(event, context):
+    print(event)
     try:
-        texto = msg.get("texto", None)
+        texto=event['data']['msg']
         topico = "urls"
         broker = "kafka.kubeless:9092" #os.environ['HOST'] + ":" + os.environ['PORTA'] #"192.168.10.133:9092"
         print(broker)

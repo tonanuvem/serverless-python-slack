@@ -1,6 +1,6 @@
 from kafka import KafkaProducer
 from kafka.errors import KafkaError
-from flask import make_response, abort
+#from flask import make_response, abort
 #from datetime import datetime
 import requests
 import json, os

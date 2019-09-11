@@ -22,7 +22,7 @@ def get_timestamp():
     return datetime.now().strftime(("%Y-%m-%d %H:%M:%S"))
 ''''
 
-def create(msg):
+def kafka(msg):
     try:
         texto = msg.get("texto", None)
         topico = "urls"

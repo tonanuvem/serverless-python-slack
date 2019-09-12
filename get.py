@@ -27,10 +27,10 @@ URLS = {
 
 def read_all():
     dict_urls = [URLS[key] for key in sorted(URLS.keys())]
-    urls = jsonify(urls)
+    urls = json.dumps(dict_urls)
     qtd = len(dict_urls)
     print("Read ALL URLS = " + str(urls))
-    return alunos
+    return urls
 
 def read_one(key):
     if key in URLS:
@@ -85,7 +85,7 @@ def get(event, context):
         erro = 'Campo vazio : link'
         print(erro)
         return erro
-    '''
+    #''
     #client = MongoClient("mongodb://%s:%s@%s/" % (usuario, senha, server)) # K8S
     client = MongoClient("mongodb://mongo.default:27017")
     db = client.bancodados
@@ -100,27 +100,24 @@ def get(event, context):
         print('Conectado ao BD = ' + str(db))
     except Exception as e:
         print("ERRO ao conectar ao Server (not available)")
-    
+    '''
     try:
-        # Decode UTF-8 bytes to Unicode, and convert single quotes 
-        # to double quotes to make it valid JSON
-        texto=event['data'].decode('utf-8').replace("'", '"')
-        print('Texto = '+ texto)
-        
+
         # Se Event_data == vazio --> read_all
-        dados = json.loads(texto)
-        print('Dados = '+ str(dados))
-        if not dados:
+        if not event['data']:
           return read_all()
         
+        # Continuando, existe Event_data
+        dados = event['data']
+        print('Dados = '+ str(dados))
+
         # Se Event_data tiver {"shorturl"} --> read_one
-        if 'shorturl' in dados:
+        if 'shorturl' in event['data']:
           shorturl = dados['shorturl']
           print('shorturl = ' + shorturl)
           return read_one(shorturl)
         
-        # Se Event_data tiver string : shorturl --> redirect_link
-        
+        # Se Event_data tiver string : shorturl --> redirect_link 
         #URLS = get_dict_from_mongodb(db)
         print("URLS = "+ str(URLS))
         

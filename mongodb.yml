@@ -1,0 +1,32 @@
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: mongo
+    spec:
+      ports:
+      - port: 27017
+      selector:
+        app: mongo
+      clusterIP: None
+    ---
+    apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+    kind: Deployment
+    metadata:
+      name: mongo
+    spec:
+      selector:
+        matchLabels:
+          app: mongo
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          labels:
+            app: mongo
+        spec:
+          containers:
+          - image: mongo:3.2.20
+            name: mongo
+            ports:
+            - containerPort: 27017
+              name: mongo

@@ -42,10 +42,10 @@ def kafka(event, context):
     except Exception as e:
         # Decide what to do if produce request failed...
         print(repr(e))
-        event.extensions.response.statusCode = 400;
+        #event.extensions.response.statusCode = 400;
         return err;
 
     # Successful result returns assigned partition and offset
     print ('Sucesso no envio. Topico: '+str(record_metadata.topic)+' Particao :' + str(record_metadata.partition) + ' Offset: ' + str(record_metadata.offset))
-    event.extensions.response.statusCode = 201;
-    return article;
+    #event.extensions.response.statusCode = 201;
+    return texto;

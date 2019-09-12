@@ -4,7 +4,7 @@ import json, os
 from pymongo import MongoClient
 
 #client = MongoClient("mongodb://localhost:27017/") # Local
-client = MongoClient("mongodb://mongo.default:27017/") # Docker
+client = MongoClient("mongodb://mongodb.default:27017/") # Docker
 db = client.tododb
 
 '''
@@ -26,6 +26,7 @@ def get_timestamp():
     
 def get_dict_from_mongodb():
     itens_db = db.clientes.find()
+    print("Itens no DB = " + itens_bd)
     URLS = {}
     for i in itens_db:
             i.pop('_id') # retira id: criado automaticamente pelo mongodb
@@ -35,6 +36,7 @@ def get_dict_from_mongodb():
 
 def bd(event, context):
     print("Evento recebido = " + str(event))
+    '''
     if not 'shorturl' in event['data']:
         erro = 'Campo vazio : shorturl'
         print(erro)
@@ -43,32 +45,49 @@ def bd(event, context):
         erro = 'Campo vazio : link'
         print(erro)
         return erro
-    if not db:
+    if not client:
         erro = 'Erro ao conectar ao BD : mongoDB'
         print(erro)
         return erro
+    '''
+    print('cheguei aqui')
+    
     try:
-        texto=str(event['data'])
+        # Decode UTF-8 bytes to Unicode, and convert single quotes 
+        # to double quotes to make it valid JSON
+        texto=event['data'].decode('utf-8').replace("'", '"')
         print('Texto = '+ texto)
-        shorturl = event['data']['shorturl']
-        link = event['data']['link']
+        dados = json.loads(texto)
+        print('Dados = '+ str(dados))
+        shorturl = dados['shorturl']
+        link = dados['link']
+        print('shorturl = ' + shorturl + " / "+ 'link = ' + link)
+        
         URLS = get_dict_from_mongodb()
+        '''
         if shorturl not in URL and shorturl is not None:
             item = {
                 "shorturl": shorturl,
                 "link": link,
                 "timestamp": get_timestamp(),
             }
+            print("Tentando inserir o seguinte item no BD = " + str(item))
             db.clientes.insert_one(item)
-            return shorturl + " criada com sucesso"
+            msg = shorturl + " criada com sucesso"
+            print(msg)
+            return msg
         else:
-            return shorturl + " ja existe"
-
+            msg = shorturl + " ja existe"
+            print(msg)
+            return msg
+        '''
     except Exception as e:
         # Decide what to do if produce request failed...
         #print(repr(e))
         #event.extensions.response.statusCode = 400;
-        return "Erro na function: " + repr(e);
+        erro = "Erro na function: " + repr(e);
+        print(erro)
+        return erro
 
 '''
     # To consume latest messages and auto-commit offsets

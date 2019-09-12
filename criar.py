@@ -24,8 +24,15 @@ def get_timestamp():
 
 def kafka(event, context):
     print(event)
+    if not 'shorturl' in event['data']:
+        return 'Campo vazio : shorturl'
+    if not 'link' in event['data']:
+        return 'Campo vazio : link'
     try:
-        texto=event['data']['msg']
+        texto=str(event['data'])
+        print('Texto = '+ texto)
+        shorturl = event['data']['shorturl']
+        link = event['data']['link']
         topico = "urls"
         broker = "kafka.kubeless:9092" #os.environ['HOST'] + ":" + os.environ['PORTA'] #"192.168.10.133:9092"
         print(broker)
@@ -43,7 +50,7 @@ def kafka(event, context):
         # Decide what to do if produce request failed...
         print(repr(e))
         #event.extensions.response.statusCode = 400;
-        return err;
+        return "Erro na function: " + repr(e);
 
     # Successful result returns assigned partition and offset
     print ('Sucesso no envio. Topico: '+str(record_metadata.topic)+' Particao :' + str(record_metadata.partition) + ' Offset: ' + str(record_metadata.offset))

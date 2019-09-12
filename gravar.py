@@ -1,3 +1,4 @@
+from datetime import datetime
 from kafka import KafkaConsumer
 import requests
 import json, os
@@ -5,12 +6,12 @@ from pymongo import MongoClient
 import urllib.parse
 
 #client = MongoClient("mongodb://localhost:27017/") # Local
-username = urllib.parse.quote_plus('user')
-password = urllib.parse.quote_plus('password')
+usuario = urllib.parse.quote_plus('user')
+senha = urllib.parse.quote_plus('password')
 server = "mongodb.default.svc.cluster.local:27017"
 
-'''
-Modelo: 
+#'''
+#Modelo: 
 URLS = {
     "link1": {
         "shorturl": "link1",
@@ -21,26 +22,33 @@ URLS = {
         "link": "http://slack.com",
     },
 }
-'''
+URLADD = {
+    "link3": {
+        "shorturl": "link3",
+        "link": "http://fiap.com.br",
+    },
+}
+#'''
 
 def get_timestamp():
     return datetime.now().strftime(("%Y-%m-%d %H:%M:%S"))
     
 def get_dict_from_mongodb(db):
-    itens_db = db.clientes.find()
+    
+    # Authentication failed # itens_db = db.clientes.find()
     if not itens_db:
         erro = 'Erro ao conectar ao BD : falha ao ler itens_db'
         print(erro)
         return erro
     print("QTD Itens no DB = " + str(db.clientes.count_documents({})) )
     URLS = {}
-    '''
+    
     for i in itens_db:
             i.pop('_id') # retira id: criado automaticamente pelo mongodb
             item = dict(i)
             URLS[item["shorturl"]] = (i)
             print("URL item [ shorturl ] = " + str(i))
-    '''
+    
     return URLS
 
 def bd(event, context):
@@ -55,13 +63,20 @@ def bd(event, context):
         print(erro)
         return erro
     '''
-    client = MongoClient("mongodb://%s:%s@%s/" % (username, password, server)) # K8S
+    #client = MongoClient("mongodb://%s:%s@%s/" % (usuario, senha, server)) # K8S
+    client = MongoClient("mongodb://mongo.default:27017")
     db = client.bancodados
-    if not client:
-        erro = 'Erro ao conectar ao BD : mongoDB'
-        print(erro)
-        return erro
-    print('Conectado ao BD = ' + str(db))
+    try:
+        # The ismaster command is cheap and does not require auth.
+        client.admin.command('ismaster')
+        #MongoClient(username=usuario, password=senha)
+        if not db:
+            erro = 'Erro ao conectar ao BD : mongoDB'
+            print(erro)
+            return erro
+        print('Conectado ao BD = ' + str(db))
+    except Exception as e:
+        print("ERRO ao conectar ao Server (not available)")
     
     try:
         # Decode UTF-8 bytes to Unicode, and convert single quotes 
@@ -74,22 +89,24 @@ def bd(event, context):
         link = dados['link']
         print('shorturl = ' + shorturl + " / "+ 'link = ' + link)
         
-        URLS = get_dict_from_mongodb(db)
+        #URLS = get_dict_from_mongodb(db)
         print("URLS = "+ str(URLS))
         
-        if shorturl not in URL and shorturl is not None:
+        if shorturl not in URLS and shorturl is not None:
             item = {
                 "shorturl": shorturl,
                 "link": link,
-                "timestamp": get_timestamp(),
+                #"timestamp": get_timestamp(),
             }
             print("Tentando inserir o seguinte item no BD = " + str(item))
-            '''
-            db.clientes.insert_one(item)
+            
+            # Authentication failed # db.clientes.insert_one(item)
+            URLS[shorturl] = item #Dict ADD
             msg = shorturl + " criada com sucesso"
             print(msg)
+            print("URLS = "+ str(URLS))
             return msg
-            '''
+            
         else:
             msg = shorturl + " ja existe"
             print(msg)

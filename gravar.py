@@ -4,8 +4,10 @@ import json, os
 from pymongo import MongoClient
 
 #client = MongoClient("mongodb://localhost:27017/") # Local
-client = MongoClient("mongodb://mongodb.default:27017/") # Docker
-db = client.tododb
+username = urllib.parse.quote_plus('user')
+password = urllib.parse.quote_plus('password')
+client = MongoClient("%s:%s@mongodb://mongodb.default.svc.cluster.local:27017/" % (username, password)) # K8S
+db = client.bancodados
 
 '''
 Modelo: 

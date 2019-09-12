@@ -34,13 +34,19 @@ def get_dict_from_mongodb():
     return URLS
 
 def bd(event, context):
-    print(event)
+    print("Evento recebido = " + str(event))
     if not 'shorturl' in event['data']:
-        return 'Campo vazio : shorturl'
+        erro = 'Campo vazio : shorturl'
+        print(erro)
+        return erro
     if not 'link' in event['data']:
-        return 'Campo vazio : link'
+        erro = 'Campo vazio : link'
+        print(erro)
+        return erro
     if not db:
-        return 'Erro ao conectar ao BD : mongoDB'
+        erro = 'Erro ao conectar ao BD : mongoDB'
+        print(erro)
+        return erro
     try:
         texto=str(event['data'])
         print('Texto = '+ texto)
@@ -57,6 +63,7 @@ def bd(event, context):
             return shorturl + " criada com sucesso"
         else:
             return shorturl + " ja existe"
+
     except Exception as e:
         # Decide what to do if produce request failed...
         #print(repr(e))
@@ -76,13 +83,10 @@ def bd(event, context):
                                               
     # consume earliest available messages, don't commit offsets
     #KafkaConsumer(auto_offset_reset='earliest', enable_auto_commit=False)
-
     # consume json messages
     #KafkaConsumer(value_deserializer=lambda m: json.loads(m.decode('ascii')))
-
     # consume msgpack
     #KafkaConsumer(value_deserializer=msgpack.unpackb)
-
     # StopIteration if no message after 1sec
     KafkaConsumer(consumer_timeout_ms=1000)
 '''

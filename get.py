@@ -33,12 +33,14 @@ def read_all():
     return urls
 
 def read_one(key):
-    if key in URLS:
+    print("Key recebida pelo Read One = " + str(key))
+    if key in URLS and key is not None:
+        print("entrou no if")
         url = URLS.get(key)
         print("Read ONE = " + str(url))
         return url
     else:
-        erro = 'Chave não encontrada'
+        erro = "Chave nao encontrada"
         print(erro)
         return erro
 
@@ -47,9 +49,16 @@ def redirect_link(key):
         url = URLS.get(key)
         link = url['link']
         print("Redirecionando para o link = " + str(link))
-        return requests.get(link)
+        
+        response = {}
+        response["statusCode"]=302
+        response["headers"]={'Location': link}
+        data = {}
+        response["body"]=json.dumps(data)
+        print("Response = "+ str(response))
+        return response
     else:
-        erro = 'Chave não encontrada'
+        erro = 'Chave não encontrada (Link nao existe)'
         print(erro)
         return erro
     
@@ -130,7 +139,8 @@ def get(event, context):
         
         if shorturl in URLS and shorturl is not None:
             print("Tentando redirecionar o seguinte item no BD = " + str(shorturl))
-            redirect_link(shorturl)
+            event['response'] = redirect_link(shorturl)
+            return event['response']
         else:
             erro = "Rota nao encontrada para = " + shorturl
             print(erro)

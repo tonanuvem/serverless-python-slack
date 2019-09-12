@@ -102,7 +102,9 @@ def get(event, context):
         print("ERRO ao conectar ao Server (not available)")
     '''
     try:
-
+        rota = str(event['extensions']['request']) #['url'])
+        print("Rota = " + rota)
+        
         # Se Event_data == vazio --> read_all
         if not event['data']:
           return read_all()
@@ -112,17 +114,19 @@ def get(event, context):
         print('Dados = '+ str(dados))
 
         # Se Event_data tiver {"shorturl"} --> read_one
-        if 'shorturl' in event['data']:
-          shorturl = dados['shorturl']
-          print('shorturl = ' + shorturl)
-          return read_one(shorturl)
+        if isinstance(dados, dict):
+            if 'shorturl' in event['data']:
+              shorturl = dados['shorturl']
+              print('shorturl = ' + shorturl)
+              return read_one(shorturl)
         
         # Se Event_data tiver string : shorturl --> redirect_link 
         #URLS = get_dict_from_mongodb(db)
         print("URLS = "+ str(URLS))
         
         #String de dados é a shorturl
-        shorturl = str(dados)
+        shorturl = dados.decode("utf-8") 
+        print("shorturl = "+ str(shorturl))
         
         if shorturl in URLS and shorturl is not None:
             print("Tentando redirecionar o seguinte item no BD = " + str(shorturl))

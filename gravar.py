@@ -57,7 +57,11 @@ def bd(event, context):
             return shorturl + " criada com sucesso"
         else:
             return shorturl + " ja existe"
-        return
+    except Exception as e:
+        # Decide what to do if produce request failed...
+        #print(repr(e))
+        #event.extensions.response.statusCode = 400;
+        return "Erro na function: " + repr(e);
 
 '''
     # To consume latest messages and auto-commit offsets

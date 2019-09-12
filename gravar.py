@@ -2,12 +2,12 @@ from kafka import KafkaConsumer
 import requests
 import json, os
 from pymongo import MongoClient
+import urllib.parse
 
 #client = MongoClient("mongodb://localhost:27017/") # Local
 username = urllib.parse.quote_plus('user')
 password = urllib.parse.quote_plus('password')
-client = MongoClient("%s:%s@mongodb://mongodb.default.svc.cluster.local:27017/" % (username, password)) # K8S
-db = client.bancodados
+server = "mongodb.default.svc.cluster.local:27017"
 
 '''
 Modelo: 
@@ -26,14 +26,21 @@ URLS = {
 def get_timestamp():
     return datetime.now().strftime(("%Y-%m-%d %H:%M:%S"))
     
-def get_dict_from_mongodb():
+def get_dict_from_mongodb(db):
     itens_db = db.clientes.find()
-    print("Itens no DB = " + itens_bd)
+    if not itens_db:
+        erro = 'Erro ao conectar ao BD : falha ao ler itens_db'
+        print(erro)
+        return erro
+    print("QTD Itens no DB = " + str(db.clientes.count_documents({})) )
     URLS = {}
+    '''
     for i in itens_db:
             i.pop('_id') # retira id: criado automaticamente pelo mongodb
             item = dict(i)
             URLS[item["shorturl"]] = (i)
+            print("URL item [ shorturl ] = " + str(i))
+    '''
     return URLS
 
 def bd(event, context):
@@ -47,12 +54,14 @@ def bd(event, context):
         erro = 'Campo vazio : link'
         print(erro)
         return erro
+    '''
+    client = MongoClient("mongodb://%s:%s@%s/" % (username, password, server)) # K8S
+    db = client.bancodados
     if not client:
         erro = 'Erro ao conectar ao BD : mongoDB'
         print(erro)
         return erro
-    '''
-    print('cheguei aqui')
+    print('Conectado ao BD = ' + str(db))
     
     try:
         # Decode UTF-8 bytes to Unicode, and convert single quotes 
@@ -65,8 +74,9 @@ def bd(event, context):
         link = dados['link']
         print('shorturl = ' + shorturl + " / "+ 'link = ' + link)
         
-        URLS = get_dict_from_mongodb()
-        '''
+        URLS = get_dict_from_mongodb(db)
+        print("URLS = "+ str(URLS))
+        
         if shorturl not in URL and shorturl is not None:
             item = {
                 "shorturl": shorturl,
@@ -74,15 +84,17 @@ def bd(event, context):
                 "timestamp": get_timestamp(),
             }
             print("Tentando inserir o seguinte item no BD = " + str(item))
+            '''
             db.clientes.insert_one(item)
             msg = shorturl + " criada com sucesso"
             print(msg)
             return msg
+            '''
         else:
             msg = shorturl + " ja existe"
             print(msg)
             return msg
-        '''
+        
     except Exception as e:
         # Decide what to do if produce request failed...
         #print(repr(e))

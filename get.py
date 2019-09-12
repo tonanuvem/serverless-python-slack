@@ -35,10 +35,24 @@ def read_all():
 def read_one(key):
     if key in URLS:
         url = URLS.get(key)
+        print("Read ONE = " + str(url))
         return url
     else:
-        return "Chave não encontrada"
+        erro = 'Chave não encontrada'
+        print(erro)
+        return erro
 
+def redirect_link(key):
+    if key in URLS:
+        url = URLS.get(key)
+        link = url['link']
+        print("Redirecionando para o link = " + str(link))
+        return requests.get(link)
+    else:
+        erro = 'Chave não encontrada'
+        print(erro)
+        return erro
+    
 def get_timestamp():
     return datetime.now().strftime(("%Y-%m-%d %H:%M:%S"))
     

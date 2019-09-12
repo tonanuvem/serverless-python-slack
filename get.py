@@ -122,11 +122,15 @@ def get(event, context):
         print("URLS = "+ str(URLS))
         
         #String de dados é a shorturl
-        shorturl = dados
+        shorturl = str(dados)
         
         if shorturl in URLS and shorturl is not None:
-            print("Tentando redirecionar o seguinte item no BD = " + str(shoturl))
+            print("Tentando redirecionar o seguinte item no BD = " + str(shorturl))
             redirect_link(shorturl)
+        else:
+            erro = "Rota nao encontrada para = " + shorturl
+            print(erro)
+            return erro
         
     except Exception as e:
         # Decide what to do if produce request failed...

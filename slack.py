@@ -6,6 +6,9 @@ canal = "#lab-testes"
 
 def handler(event, context):
     print(event)
+    if not 'msg' in event['data']:
+        return 'Campo vazio : msg'
+    #exemplo de uso: kubeless function call slack --data '{"msg":"Serverless é show!"}'
     texto=event['data']['msg']
     print(texto)
     #return event['data']

@@ -9,6 +9,7 @@ def handler(event, context):
     if not 'msg' in event['data']:
         return 'Campo vazio : msg'
     #exemplo de uso: kubeless function call slack --data '{"msg": "ALUNO: Bem vindo ao mundo do Serverless"}'
+    #obs: ao rodar via command line, não há suporte caracteres especiais (ex: assentos)
     texto=event['data']['msg']
     print("Texto = "+ texto)
     return postMSG_criada_para_o_slack(texto)

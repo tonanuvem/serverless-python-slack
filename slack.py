@@ -10,10 +10,7 @@ def handler(event, context):
         return 'Campo vazio : msg'
     #exemplo de uso: kubeless function call slack --data '{"msg":"Serverless é show!"}'
     texto=event['data']['msg']
-    print(texto)
-    #return event['data']
-    #exemplo de uso: kubeless function call slack --data '{"msg":"This is a message to SLACK"}'
-
+    print("Texto = "+ texto)
     return postMSG_criada_para_o_slack(texto)
     
 def postMSG_criada_para_o_slack(msg):
